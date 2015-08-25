@@ -1,5 +1,5 @@
-/* jshint node: true */
-/* global describe, it, beforeEach, afterEach, -Promise */
+/* jshint node: true, expr: true */
+/* global describe, it, beforeEach, afterEach */
 
 'use strict';
 
@@ -341,7 +341,7 @@ describe('Parselovin', function () {
         return result;
       };
 
-      var length = 10000;
+      var length = 100000;
       var exampleHtml = htmlEnvelope('', repeat('<div><p>Test</p>', length) + repeat('</div>', length));
 
       var expectation = mockedConsole.expects('log').atLeast(1);
@@ -360,7 +360,7 @@ describe('Parselovin', function () {
       result.should.be.instanceof(RangeError).with.property('message').that.has.string('call stack size');
 
       mockedConsole.verify();
-      expectation.calledWith('Error parsing HTML').should.be.ok();
+      expectation.calledWith('Error parsing HTML').should.be.ok;
     });
 
     it('should parse x-frame-options headers', function () {
@@ -414,7 +414,7 @@ describe('Parselovin', function () {
           should.not.exist(err);
           result.should.have.property('url', 'http://example.com/');
           result.should.have.property('meta').that.deep.equals({foo: 123});
-          result.should.have.deep.property('data.og').that.is.not.empty();
+          result.should.have.deep.property('data.og').that.is.not.empty;
 
           done();
         });
@@ -434,7 +434,7 @@ describe('Parselovin', function () {
           should.not.exist(err);
           result.should.have.property('url', 'http://example.com/');
           result.should.have.property('meta').that.deep.equals({foo: 123});
-          result.should.have.deep.property('data.og').that.is.not.empty();
+          result.should.have.deep.property('data.og').that.is.not.empty;
 
           done();
         });
@@ -490,13 +490,13 @@ describe('Parselovin', function () {
           result.should.have.deep.property('[0].err', null);
           result.should.have.deep.property('[0].result.url', 'http://example.com/foo');
           result.should.have.deep.property('[0].result.meta').that.deep.equals({foo: 123});
-          result.should.have.deep.property('[0].result.data.og').that.is.not.empty();
+          result.should.have.deep.property('[0].result.data.og').that.is.not.empty;
 
           result.should.have.deep.property('[1].err', null);
           result.should.have.deep.property('[1].result.url', 'http://example.com/bar');
           result.should.have.deep.property('[1].result.meta').that.deep.equals({bar: 456});
-          result.should.have.deep.property('[1].result.data.og').that.is.not.empty();
-          result.should.have.deep.property('[1].result.data.metaProperties').that.is.not.empty();
+          result.should.have.deep.property('[1].result.data.og').that.is.not.empty;
+          result.should.have.deep.property('[1].result.data.metaProperties').that.is.not.empty;
 
           done();
         });
@@ -528,13 +528,13 @@ describe('Parselovin', function () {
           result.should.have.deep.property('[0].err', null);
           result.should.have.deep.property('[0].result.url', 'http://example.com/foo');
           result.should.have.deep.property('[0].result.meta').that.deep.equals({foo: 123});
-          result.should.have.deep.property('[0].result.data.og').that.is.not.empty();
+          result.should.have.deep.property('[0].result.data.og').that.is.not.empty;
 
           result.should.have.deep.property('[1].err', null);
           result.should.have.deep.property('[1].result.url', 'http://example.com/bar');
           result.should.have.deep.property('[1].result.meta').that.deep.equals({bar: 456});
-          result.should.have.deep.property('[1].result.data.og').that.is.not.empty();
-          result.should.have.deep.property('[1].result.data.metaProperties').that.is.not.empty();
+          result.should.have.deep.property('[1].result.data.og').that.is.not.empty;
+          result.should.have.deep.property('[1].result.data.metaProperties').that.is.not.empty;
 
           done();
         });
@@ -569,8 +569,8 @@ describe('Parselovin', function () {
           result.should.have.deep.property('[1].err', null);
           result.should.have.deep.property('[1].result.url', 'http://example.com/bar');
           result.should.have.deep.property('[1].result.meta').that.deep.equals({bar: 456});
-          result.should.have.deep.property('[1].result.data.og').that.is.not.empty();
-          result.should.have.deep.property('[1].result.data.metaProperties').that.is.not.empty();
+          result.should.have.deep.property('[1].result.data.og').that.is.not.empty;
+          result.should.have.deep.property('[1].result.data.metaProperties').that.is.not.empty;
 
           done();
         });
