@@ -7,6 +7,7 @@ var urlModule = require('url');
 
 var cheerio = require('cheerio');
 var request = require('request');
+var extend = require('ampersand-class-extend');
 var pkg = require('./package.json');
 var defaultUserAgent = pkg.name + '/' + pkg.version + (pkg.homepage ? ' (' + pkg.homepage + ')' : '');
 var AWS, sqs;
@@ -121,16 +122,45 @@ var normalizeOGData = function (og) {
   return og;
 };
 
-var extract = function (url, html, res) {
-  var $ = cheerio.load(html);
+var MetaDataParser = function () {
+  this.extractors = {};
+  this.orderedExtractors = [];
+
+  this.addDefaultExtractors();
+};
+
+MetaDataParser.extend = extend;
+
+MetaDataParser.prototype.addDefaultExtractors = function () {
+  this.addExtractor('og', this.extractOg);
+  this.addExtractor('metaProperties', this.extractMetaProperties);
+  this.addExtractor('links', this.extractLinks);
+  this.addExtractor('headers', this.extractHeaders);
+};
+
+MetaDataParser.prototype.addExtractor = function (name, method) {
+  this.extractors[name] = method;
+  this.orderedExtractors.push(method);
+};
+
+MetaDataParser.prototype.removeExtractor = function (name) {
+  var method, pos;
+
+  method = this.extractors[name];
+
+  if (method) {
+    pos = this.orderedExtractors.indexOf(method);
+    if (pos !== -1) {
+      this.orderedExtractors.splice(pos, 1);
+    }
+    delete this.extractors[name];
+  }
+};
+
+MetaDataParser.prototype.extractOg = function ($, data) {
   var currentRootTag;
   var currentRootName;
   var ogType;
-  var data = {
-    metaProperties: {},
-    links: {},
-    headers: {},
-  };
 
   var extractOG = function (localData, elem) {
     var $elem = $(elem);
@@ -168,14 +198,6 @@ var extract = function (url, html, res) {
     return localData;
   };
 
-  try {
-    data.baseUrl = $('base').attr('href');
-  } catch (e) {
-    console.log('Error parsing HTML', e, e.stack);
-    return e;
-  }
-
-  data.baseUrl = data.baseUrl ? urlModule.resolve(url, data.baseUrl) : url;
 
   data.og = $('meta[property^="og:"]').get().reduce(extractOG, {});
   data.og = normalizeOGData(data.og);
@@ -186,6 +208,12 @@ var extract = function (url, html, res) {
     data.ogType = data.og.type[0].value;
     data.ogTypeData = $('meta[property^="' + ogType + ':"]').get().reduce(extractOG, {});
   }
+
+  return data;
+};
+
+MetaDataParser.prototype.extractMetaProperties = function ($, data) {
+  data.metaProperties = {};
 
   $('meta[property^="fb:"]').each(function () {
     var $this = $(this);
@@ -204,6 +232,14 @@ var extract = function (url, html, res) {
     data.metaProperties[property] = data.metaProperties[property] || [];
     data.metaProperties[property].push(value);
   });
+
+  return data;
+};
+
+MetaDataParser.prototype.extractLinks = function ($, data) {
+  //TODO: Extract from context.res headers as well
+
+  data.links = {};
 
   $('head > link[rel]').each(function () {
     var attributes = ['hreflang', 'title', 'type'];
@@ -239,13 +275,48 @@ var extract = function (url, html, res) {
     });
   });
 
+  return data;
+};
+
+MetaDataParser.prototype.extractHeaders = function ($, data, context) {
+  var res = context.res;
+
+  data.headers = {};
+
   if (res && res.headers['x-frame-options']) {
     data.headers['x-frame-options'] = res.headers['x-frame-options'];
   }
 
   return data;
 };
-var fetch = function (url, meta, options, callback) {
+
+MetaDataParser.prototype.extract = function (url, html, res) {
+  var $ = cheerio.load(html);
+  var data = {};
+  var context = {
+    url: url,
+    res: res,
+  };
+
+  try {
+    data.baseUrl = $('base').attr('href');
+  } catch (e) {
+    console.log('Error parsing HTML', e, e.stack);
+    return e;
+  }
+
+  data.baseUrl = data.baseUrl ? urlModule.resolve(url, data.baseUrl) : url;
+
+  data = this.orderedExtractors.reduce(function (data, extractionMethod) {
+    return extractionMethod.call(this, $, data, context);
+  }, data);
+
+  return data;
+};
+
+MetaDataParser.prototype.fetch = function (url, meta, options, callback) {
+  var self = this;
+
   if (typeof options === 'function') {
     callback = options;
     options = {};
@@ -270,7 +341,7 @@ var fetch = function (url, meta, options, callback) {
       }
     }
     if (!err && !result.redirect) {
-      result.data = extract(url, body, res);
+      result.data = self.extract(url, body, res);
       if (result.data instanceof Error) {
         err = result.data;
         delete result.data;
@@ -284,8 +355,10 @@ var fetch = function (url, meta, options, callback) {
     callback(null, result);
   });
 };
-var fetchBatch = function (request, callback) {
-  var aws;
+
+MetaDataParser.prototype.fetchBatch = function (request, callback) {
+  var self = this,
+    aws;
 
   if (callback.done) {
     aws = request.aws;
@@ -332,13 +405,11 @@ var fetchBatch = function (request, callback) {
       if (aws) {
         console.log('Fetching', item.url);
       }
-      fetch(item.url, item.meta || {}, options, handleCallback);
+      self.fetch(item.url, item.meta || {}, options, handleCallback);
     }
   });
 };
 
-module.exports = {
-  extract: extract,
-  fetch: fetch,
-  fetchBatch: fetchBatch,
-};
+MetaDataParser.MetaDataParser = MetaDataParser;
+
+module.exports = new MetaDataParser();
