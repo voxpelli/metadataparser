@@ -423,6 +423,6 @@ MetaDataParser.prototype.fetchBatch = function (request, callback) {
   });
 };
 
-MetaDataParser.MetaDataParser = MetaDataParser;
-
 module.exports = new MetaDataParser();
+
+module.exports.MetaDataParser = MetaDataParser;
