@@ -8,6 +8,7 @@ var urlModule = require('url');
 var cheerio = require('cheerio');
 var request = require('request');
 var extend = require('ampersand-class-extend');
+var Promise = require('promise');
 var pkg = require('./package.json');
 var defaultUserAgent = pkg.name + '/' + pkg.version + (pkg.homepage ? ' (' + pkg.homepage + ')' : '');
 var AWS, sqs;
@@ -291,27 +292,31 @@ MetaDataParser.prototype.extractHeaders = function ($, data, context) {
 };
 
 MetaDataParser.prototype.extract = function (url, html, res) {
+  var self = this;
   var $ = cheerio.load(html);
-  var data = {};
+  var baseUrl;
   var context = {
     url: url,
     res: res,
   };
+  var dataChain;
 
   try {
-    data.baseUrl = $('base').attr('href');
+    baseUrl = $('base').attr('href');
   } catch (e) {
     console.log('Error parsing HTML', e, e.stack);
-    return e;
+    return Promise.reject(e);
   }
 
-  data.baseUrl = data.baseUrl ? urlModule.resolve(url, data.baseUrl) : url;
+  baseUrl = baseUrl ? urlModule.resolve(url, baseUrl) : url;
 
-  data = this.orderedExtractors.reduce(function (data, extractionMethod) {
-    return extractionMethod.call(this, $, data, context);
-  }, data);
+  dataChain = this.orderedExtractors.reduce(function (dataChain, extractionMethod) {
+    return dataChain.then(function (data) {
+      return extractionMethod.call(self, $, data, context);
+    });
+  }, Promise.resolve({ baseUrl: baseUrl }));
 
-  return data;
+  return dataChain;
 };
 
 MetaDataParser.prototype.fetch = function (url, meta, options, callback) {
@@ -331,28 +336,36 @@ MetaDataParser.prototype.fetch = function (url, meta, options, callback) {
     var result = {
       url: url,
       meta: meta,
-    };
-
-    if (!err && res.statusCode > 299) {
-      if (res.statusCode < 400 && res.headers.location) {
-        result.redirect = urlModule.resolve(url, res.headers.location);
-      } else {
-        err = new Error('Invalid response. Code ' + res.statusCode);
-      }
-    }
-    if (!err && !result.redirect) {
-      result.data = self.extract(url, body, res);
-      if (result.data instanceof Error) {
-        err = result.data;
-        delete result.data;
-      }
-    }
+    },
+    promisedResult;
 
     if (err) {
-      return callback(err ? err.message : null, result);
+      promisedResult = Promise.reject(err);
+    } else if (res.statusCode > 299) {
+      if (res.statusCode < 400 && res.headers.location) {
+        result.redirect = urlModule.resolve(url, res.headers.location);
+        promisedResult = Promise.resolve(result);
+      } else {
+        promisedResult = Promise.reject(new Error('Invalid response. Code ' + res.statusCode));
+      }
+    } else {
+      promisedResult = self.extract(url, body, res).then(function (data) {
+        result.data = data;
+        return result;
+      });
     }
 
-    callback(null, result);
+    promisedResult
+      .then(function (result) {
+        setImmediate(function () {
+          callback(null, result);
+        });
+      })
+      .catch(function (err) {
+        setImmediate(function () {
+          callback(err ? err.message : null, result);
+        });
+      });
   });
 };
 

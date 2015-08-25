@@ -1,12 +1,15 @@
 /* jshint node: true, expr: true */
-/* global describe, it, beforeEach, afterEach */
+/* global describe, it, beforeEach, afterEach, -Promise */
 
 'use strict';
 
 var chai = require('chai');
 var nock = require('nock');
 var sinon = require('sinon');
+var chaiAsPromised = require('chai-as-promised');
+var Promise = require('promise');
 
+chai.use(chaiAsPromised);
 var should = chai.should();
 
 describe('Parselovin', function () {
@@ -81,7 +84,7 @@ describe('Parselovin', function () {
     it('should parse all Open Graph generic tags', function () {
       var result = parser.extract('http://example.com/', basicHTML);
 
-      result.should.be.an('object').with.property('og').that.deep.equals({
+      return result.should.eventually.be.an('object').with.property('og').that.deep.equals({
         title: [{value: 'The Rock'}],
         type:  [{value: 'video.movie'}],
         url:   [{value: 'http://www.imdb.com/title/tt0117500/'}],
@@ -102,7 +105,7 @@ describe('Parselovin', function () {
 
       var result = parser.extract('http://example.com/', exampleHtml);
 
-      result.should.be.an('object').with.property('og').that.deep.equals({
+      return result.should.eventually.be.an('object').with.property('og').that.deep.equals({
         image: [
           {value: 'http://example.com/rock.jpg', properties: {width: 300, height: 300}},
           {value: 'http://example.com/rock2.jpg'},
@@ -122,7 +125,7 @@ describe('Parselovin', function () {
 
       var result = parser.extract('http://example.com/', exampleHtml);
 
-      result.should.be.an('object').with.property('og').that.deep.equals({
+      return result.should.eventually.be.an('object').with.property('og').that.deep.equals({
         image: [
           {value: 'http://example.com/rock2.jpg'},
           {value: 'http://example.com/rock3.jpg'},
@@ -135,15 +138,17 @@ describe('Parselovin', function () {
     it('should parse all Open Graph type-specific tags', function () {
       var result = parser.extract('http://example.com/', bigExampleHTML);
 
-      result.should.be.an('object');
-      result.should.have.deep.property('og.type').that.deep.equals([{value: 'article'}]);
-      result.should.have.property('ogType', 'article');
-      result.should.have.property('ogTypeData').that.deep.equals({
-        'published_time': [{value: '2013-09-17T05:59:00+01:00'}],
-        'modified_time':  [{value: '2013-09-16T19:08:47+01:00'}],
-        'section':        [{value: 'Article Section'}],
-        'tag':            [{value: 'Article Tag'}],
-      });
+      return Promise.all([
+        result.should.eventually.be.an('object'),
+        result.should.eventually.have.deep.property('og.type').that.deep.equals([{value: 'article'}]),
+        result.should.eventually.have.property('ogType', 'article'),
+        result.should.eventually.have.property('ogTypeData').that.deep.equals({
+          'published_time': [{value: '2013-09-17T05:59:00+01:00'}],
+          'modified_time':  [{value: '2013-09-16T19:08:47+01:00'}],
+          'section':        [{value: 'Article Section'}],
+          'tag':            [{value: 'Article Tag'}],
+        }),
+      ]);
     });
 
     it('should ignore broken tags', function () {
@@ -155,7 +160,7 @@ describe('Parselovin', function () {
 
       var result = parser.extract('http://example.com/', exampleHtml);
 
-      result.should.be.an('object').with.property('og').that.deep.equals({
+      return result.should.eventually.be.an('object').with.property('og').that.deep.equals({
         image: [{value: 'http://example.com/rock.jpg'}],
       });
     });
@@ -168,7 +173,7 @@ describe('Parselovin', function () {
 
       var result = parser.extract('http://example.com/', exampleHtml);
 
-      result.should.be.an('object').with.property('baseUrl', 'http://www.example.org/foo/');
+      return result.should.eventually.be.an('object').with.property('baseUrl', 'http://www.example.org/foo/');
     });
 
     it('should parse relative base tag', function () {
@@ -176,7 +181,7 @@ describe('Parselovin', function () {
 
       var result = parser.extract('http://example.com/foo/', exampleHtml);
 
-      result.should.be.an('object').with.property('baseUrl', 'http://example.com/foo/bar/');
+      return result.should.eventually.be.an('object').with.property('baseUrl', 'http://example.com/foo/bar/');
     });
 
     it('should resolve URL:s in Open Graph tags', function () {
@@ -189,7 +194,7 @@ describe('Parselovin', function () {
 
       var result = parser.extract('http://example.org/', exampleHtml);
 
-      result.should.be.an('object').with.property('og').that.deep.equals({
+      return result.should.eventually.be.an('object').with.property('og').that.deep.equals({
         image: [{value: 'http://example.org/rock.jpg'}],
         video: [{value: 'http://example.org/rock.avi'}],
         audio: [{value: 'http://example.org/rock.wav'}],
@@ -205,7 +210,7 @@ describe('Parselovin', function () {
 
       var result = parser.extract('http://example.com/', exampleHtml);
 
-      result.should.be.an('object').with.property('og').that.deep.equals({
+      return result.should.eventually.be.an('object').with.property('og').that.deep.equals({
         image: [{value: 'http://www.example.org/foo/rock.jpg'}],
       });
     });
@@ -223,7 +228,7 @@ describe('Parselovin', function () {
 
       var result = parser.extract('http://example.org/', exampleHtml);
 
-      result.should.be.an('object').with.property('og').that.deep.equals({
+      return result.should.eventually.be.an('object').with.property('og').that.deep.equals({
         image: [
           {value: 'http://example.com/rock.jpg'},
         ],
@@ -240,7 +245,7 @@ describe('Parselovin', function () {
 
       var result = parser.extract('http://example.org/', exampleHtml);
 
-      result.should.be.an('object').with.property('og').that.deep.equals({
+      return result.should.eventually.be.an('object').with.property('og').that.deep.equals({
         image: [
           {value: 'http://example.com/rock.jpg'},
         ],
@@ -249,7 +254,7 @@ describe('Parselovin', function () {
     it('should parse non-Open Graph social media tags', function () {
       var result = parser.extract('http://example.com/', bigExampleHTML);
 
-      result.should.be.an('object').with.property('metaProperties').that.deep.equals({
+      return result.should.eventually.be.an('object').with.property('metaProperties').that.deep.equals({
         'fb:admins': ['Facebook numberic ID'],
         'twitter:card': ['summary_large_image'],
         'twitter:site': ['@publisher_handle'],
@@ -265,7 +270,7 @@ describe('Parselovin', function () {
 
       var result = parser.extract('http://example.com/', exampleHtml);
 
-      result.should.be.an('object').with.property('metaProperties').that.deep.equals({
+      return result.should.eventually.be.an('object').with.property('metaProperties').that.deep.equals({
         generator: ['WordPress 4.1'],
       });
     });
@@ -281,7 +286,7 @@ describe('Parselovin', function () {
 
       var result = parser.extract('http://example.com/', exampleHtml);
 
-      result.should.be.an('object').with.property('links').that.deep.equals({
+      return result.should.eventually.be.an('object').with.property('links').that.deep.equals({
         home: [
           {href: 'http://example.com/all.xml', title: 'All posts', type: 'application/atom+xml'},
           {href: 'http://example.com/english.xml', title: 'English posts', type: 'application/atom+xml'},
@@ -304,7 +309,7 @@ describe('Parselovin', function () {
 
       var result = parser.extract('http://example.com/', exampleHtml);
 
-      result.should.be.an('object').with.property('links').that.deep.equals({
+      return result.should.eventually.be.an('object').with.property('links').that.deep.equals({
         home: [
           {href: 'http://example.com/english.xml'},
         ],
@@ -323,7 +328,7 @@ describe('Parselovin', function () {
 
       var result = parser.extract('http://example.com/', exampleHtml);
 
-      result.should.be.an('object').with.property('links').that.deep.equals({
+      return result.should.eventually.be.an('object').with.property('links').that.deep.equals({
         alternate: [
           {href: 'http://example.com/english.xml', title: 'English posts', type: 'application/atom+xml'},
         ],
@@ -354,13 +359,16 @@ describe('Parselovin', function () {
         exception = e;
       }
 
-      should.not.exist(exception);
-      should.exist(result);
+      return result.then(function () {
+        throw new Error('Should trigger an error');
+      }).catch(function (result) {
+        should.exist(result);
 
-      result.should.be.instanceof(RangeError).with.property('message').that.has.string('call stack size');
+        result.should.be.instanceof(RangeError).with.property('message').that.has.string('call stack size');
 
-      mockedConsole.verify();
-      expectation.calledWith('Error parsing HTML').should.be.ok;
+        mockedConsole.verify();
+        expectation.calledWith('Error parsing HTML').should.be.ok;
+      });
     });
 
     it('should parse x-frame-options headers', function () {
@@ -370,7 +378,7 @@ describe('Parselovin', function () {
 
       var result = parser.extract('http://example.com/', basicHTML, res);
 
-      result.should.be.an('object').with.property('headers').that.deep.equals({
+      return result.should.eventually.be.an('object').with.property('headers').that.deep.equals({
         'x-frame-options': 'SAMEORIGIN',
       });
     });
@@ -409,6 +417,7 @@ describe('Parselovin', function () {
           });
 
         parser.fetch('http://example.com/', {foo: 123}, function (err, result) {
+
           mock.done();
 
           should.not.exist(err);
