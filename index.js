@@ -291,7 +291,9 @@ MetaDataParser.prototype.extractHeaders = function ($, data, context) {
   return data;
 };
 
-MetaDataParser.prototype.extract = function (url, html, res) {
+MetaDataParser.prototype.extract = function (url, html, res, options) {
+  options = options || {};
+
   var self = this;
   var $ = cheerio.load(html);
   var baseUrl;
@@ -300,6 +302,7 @@ MetaDataParser.prototype.extract = function (url, html, res) {
     res: res,
   };
   var dataChain;
+  var extractorSubset;
 
   try {
     baseUrl = $('base').attr('href');
@@ -310,7 +313,19 @@ MetaDataParser.prototype.extract = function (url, html, res) {
 
   baseUrl = baseUrl ? urlModule.resolve(url, baseUrl) : url;
 
+  if (options.extractors) {
+    extractorSubset = [];
+    [].concat(options.extractors).forEach(function (extractorName) {
+      extractorSubset.push(self.extractors[extractorName]);
+    });
+  }
+
   dataChain = this.orderedExtractors.reduce(function (dataChain, extractionMethod) {
+    // Only apply the requested extractors
+    if (extractorSubset && extractorSubset.indexOf(extractionMethod) === -1) {
+      return dataChain;
+    }
+    // Add the extractor to the Promise chain
     return dataChain.then(function (data) {
       return extractionMethod.call(self, $, data, context);
     });
@@ -349,7 +364,9 @@ MetaDataParser.prototype.fetch = function (url, meta, options, callback) {
         promisedResult = Promise.reject(new Error('Invalid response. Code ' + res.statusCode));
       }
     } else {
-      promisedResult = self.extract(url, body, res).then(function (data) {
+      promisedResult = self.extract(url, body, res, {
+        extractors: options.extractors
+      }).then(function (data) {
         result.data = data;
         return result;
       });

@@ -385,6 +385,18 @@ describe('Parselovin', function () {
 
     // Should adhere to http://tools.ietf.org/html/rfc5988 and parse both HTTP headers and HTML link-tags
     it('should parse link relations from all valid locations');
+
+    it('should only run requested extractors', function () {
+      var result = parser.extract('http://example.com/', bigExampleHTML, undefined, {
+        extractors: 'og',
+      });
+
+      return Promise.all([
+        result.should.eventually.be.an('object'),
+        result.should.eventually.have.deep.property('og.type').that.deep.equals([{value: 'article'}]),
+        result.should.eventually.not.have.property('metaProperties'),
+      ]);
+    });
   });
 
   describe('fetch methods', function () {
