@@ -1,6 +1,3 @@
-/* jshint node: true, expr: true */
-/* global describe, it, beforeEach, afterEach, -Promise */
-
 'use strict';
 
 var chai = require('chai');
@@ -86,9 +83,9 @@ describe('Parselovin', function () {
 
       return result.should.eventually.be.an('object').with.property('og').that.deep.equals({
         title: [{value: 'The Rock'}],
-        type:  [{value: 'video.movie'}],
-        url:   [{value: 'http://www.imdb.com/title/tt0117500/'}],
-        image: [{value: 'http://ia.media-imdb.com/images/rock.jpg'}],
+        type: [{value: 'video.movie'}],
+        url: [{value: 'http://www.imdb.com/title/tt0117500/'}],
+        image: [{value: 'http://ia.media-imdb.com/images/rock.jpg'}]
       });
     });
 
@@ -109,8 +106,8 @@ describe('Parselovin', function () {
         image: [
           {value: 'http://example.com/rock.jpg', properties: {width: 300, height: 300}},
           {value: 'http://example.com/rock2.jpg'},
-          {value: 'http://example.com/rock3.jpg', properties: {height: 1000}},
-        ],
+          {value: 'http://example.com/rock3.jpg', properties: {height: 1000}}
+        ]
       });
     });
 
@@ -128,10 +125,10 @@ describe('Parselovin', function () {
       return result.should.eventually.be.an('object').with.property('og').that.deep.equals({
         image: [
           {value: 'http://example.com/rock2.jpg'},
-          {value: 'http://example.com/rock3.jpg'},
+          {value: 'http://example.com/rock3.jpg'}
         ],
         video: [{value: 'http://example.com/rock.avi'}],
-        audio: [{value: 'http://example.com/rock.wav'}],
+        audio: [{value: 'http://example.com/rock.wav'}]
       });
     });
 
@@ -144,10 +141,10 @@ describe('Parselovin', function () {
         result.should.eventually.have.property('ogType', 'article'),
         result.should.eventually.have.property('ogTypeData').that.deep.equals({
           'published_time': [{value: '2013-09-17T05:59:00+01:00'}],
-          'modified_time':  [{value: '2013-09-16T19:08:47+01:00'}],
-          'section':        [{value: 'Article Section'}],
-          'tag':            [{value: 'Article Tag'}],
-        }),
+          'modified_time': [{value: '2013-09-16T19:08:47+01:00'}],
+          'section': [{value: 'Article Section'}],
+          'tag': [{value: 'Article Tag'}]
+        })
       ]);
     });
 
@@ -161,7 +158,7 @@ describe('Parselovin', function () {
       var result = parser.extract('http://example.com/', exampleHtml);
 
       return result.should.eventually.be.an('object').with.property('og').that.deep.equals({
-        image: [{value: 'http://example.com/rock.jpg'}],
+        image: [{value: 'http://example.com/rock.jpg'}]
       });
     });
 
@@ -198,7 +195,7 @@ describe('Parselovin', function () {
         image: [{value: 'http://example.org/rock.jpg'}],
         video: [{value: 'http://example.org/rock.avi'}],
         audio: [{value: 'http://example.org/rock.wav'}],
-        url: [{value: 'http://example.org/home'}],
+        url: [{value: 'http://example.org/home'}]
       });
     });
 
@@ -211,7 +208,7 @@ describe('Parselovin', function () {
       var result = parser.extract('http://example.com/', exampleHtml);
 
       return result.should.eventually.be.an('object').with.property('og').that.deep.equals({
-        image: [{value: 'http://www.example.org/foo/rock.jpg'}],
+        image: [{value: 'http://www.example.org/foo/rock.jpg'}]
       });
     });
 
@@ -230,8 +227,8 @@ describe('Parselovin', function () {
 
       return result.should.eventually.be.an('object').with.property('og').that.deep.equals({
         image: [
-          {value: 'http://example.com/rock.jpg'},
-        ],
+          {value: 'http://example.com/rock.jpg'}
+        ]
       });
     });
 
@@ -247,8 +244,8 @@ describe('Parselovin', function () {
 
       return result.should.eventually.be.an('object').with.property('og').that.deep.equals({
         image: [
-          {value: 'http://example.com/rock.jpg'},
-        ],
+          {value: 'http://example.com/rock.jpg'}
+        ]
       });
     });
     it('should parse non-Open Graph social media tags', function () {
@@ -261,7 +258,7 @@ describe('Parselovin', function () {
         'twitter:title': ['Page Title'],
         'twitter:description': ['Page description less than 200 characters'],
         'twitter:creator': ['@author_handle'],
-        'twitter:image:src': ['http://www.example.com/image.html'],
+        'twitter:image:src': ['http://www.example.com/image.html']
       });
     });
 
@@ -271,7 +268,7 @@ describe('Parselovin', function () {
       var result = parser.extract('http://example.com/', exampleHtml);
 
       return result.should.eventually.be.an('object').with.property('metaProperties').that.deep.equals({
-        generator: ['WordPress 4.1'],
+        generator: ['WordPress 4.1']
       });
     });
 
@@ -289,15 +286,15 @@ describe('Parselovin', function () {
       return result.should.eventually.be.an('object').with.property('links').that.deep.equals({
         home: [
           {href: 'http://example.com/all.xml', title: 'All posts', type: 'application/atom+xml'},
-          {href: 'http://example.com/english.xml', title: 'English posts', type: 'application/atom+xml'},
+          {href: 'http://example.com/english.xml', title: 'English posts', type: 'application/atom+xml'}
         ],
         alternate: [
           {href: 'http://example.com/all.xml', title: 'All posts', type: 'application/atom+xml'},
           {href: 'http://example.com/english.xml', title: 'English posts', type: 'application/atom+xml'},
-          {href: 'http://es.example.com/', hreflang: 'es'},
+          {href: 'http://es.example.com/', hreflang: 'es'}
         ],
         canonical: [{href: 'http://example.com/2015/01/entry-name/'}],
-        author: [{href: 'http://example.com/', title: 'Bob Smith', type: 'text/html'}],
+        author: [{href: 'http://example.com/', title: 'Bob Smith', type: 'text/html'}]
       });
     });
 
@@ -311,12 +308,12 @@ describe('Parselovin', function () {
 
       return result.should.eventually.be.an('object').with.property('links').that.deep.equals({
         home: [
-          {href: 'http://example.com/english.xml'},
+          {href: 'http://example.com/english.xml'}
         ],
         alternate: [
           {href: 'http://example.com/english.xml'},
-          {href: 'http://es.example.com/'},
-        ],
+          {href: 'http://es.example.com/'}
+        ]
       });
     });
 
@@ -330,8 +327,8 @@ describe('Parselovin', function () {
 
       return result.should.eventually.be.an('object').with.property('links').that.deep.equals({
         alternate: [
-          {href: 'http://example.com/english.xml', title: 'English posts', type: 'application/atom+xml'},
-        ],
+          {href: 'http://example.com/english.xml', title: 'English posts', type: 'application/atom+xml'}
+        ]
       });
     });
 
@@ -339,8 +336,8 @@ describe('Parselovin', function () {
       // "RangeError: Maximum call stack size exceeded" should not crash the script
 
       var repeat = function (data, count) {
-        var result = '', i = 0;
-        for (; i < count; i++) {
+        var result = '';
+        for (var i = 0; i < count; i++) {
           result += data;
         }
         return result;
@@ -359,6 +356,8 @@ describe('Parselovin', function () {
         exception = e;
       }
 
+      should.not.exist(exception);
+
       return result.then(function () {
         throw new Error('Should trigger an error');
       }).catch(function (result) {
@@ -373,13 +372,13 @@ describe('Parselovin', function () {
 
     it('should parse x-frame-options headers', function () {
       var res = {
-        headers: { 'x-frame-options': 'SAMEORIGIN' },
+        headers: { 'x-frame-options': 'SAMEORIGIN' }
       };
 
       var result = parser.extract('http://example.com/', basicHTML, res);
 
       return result.should.eventually.be.an('object').with.property('headers').that.deep.equals({
-        'x-frame-options': 'SAMEORIGIN',
+        'x-frame-options': 'SAMEORIGIN'
       });
     });
 
@@ -388,13 +387,13 @@ describe('Parselovin', function () {
 
     it('should only run requested extractors', function () {
       var result = parser.extract('http://example.com/', bigExampleHTML, undefined, {
-        extractors: 'og',
+        extractors: 'og'
       });
 
       return Promise.all([
         result.should.eventually.be.an('object'),
         result.should.eventually.have.deep.property('og.type').that.deep.equals([{value: 'article'}]),
-        result.should.eventually.not.have.property('metaProperties'),
+        result.should.eventually.not.have.property('metaProperties')
       ]);
     });
   });
@@ -419,7 +418,6 @@ describe('Parselovin', function () {
     });
 
     describe('fetch', function () {
-
       it('should process the webpage', function (done) {
         var mock = nock('http://example.com/')
           .matchHeader('User-Agent', defaultUserAgentRegExp)
@@ -429,7 +427,6 @@ describe('Parselovin', function () {
           });
 
         parser.fetch('http://example.com/', {foo: 123}, function (err, result) {
-
           mock.done();
 
           should.not.exist(err);
@@ -481,11 +478,9 @@ describe('Parselovin', function () {
           done();
         });
       });
-
     });
 
     describe('fetchBatch', function () {
-
       it('should process the webpages', function (done) {
         var mock = nock('http://example.com/')
           .matchHeader('User-Agent', defaultUserAgentRegExp)
@@ -501,7 +496,7 @@ describe('Parselovin', function () {
         parser.fetchBatch({
           batch: [
             {url: 'http://example.com/foo', meta: {foo: 123}},
-            {url: 'http://example.com/bar', meta: {bar: 456}},
+            {url: 'http://example.com/bar', meta: {bar: 456}}
           ]
         }, function (result) {
           mock.done();
@@ -538,9 +533,9 @@ describe('Parselovin', function () {
         parser.fetchBatch({
           batch: [
             {url: 'http://example.com/foo', meta: {foo: 123}},
-            {url: 'http://example.com/bar', meta: {bar: 456}},
+            {url: 'http://example.com/bar', meta: {bar: 456}}
           ],
-          options: {userAgent: 'Test/1.0'},
+          options: {userAgent: 'Test/1.0'}
         }, function (result) {
           mock.done();
 
@@ -573,9 +568,9 @@ describe('Parselovin', function () {
           });
 
         parser.fetchBatch({
-          batch : [
+          batch: [
             {url: 'http://example.com/foo', meta: {foo: 123}},
-            {url: 'http://example.com/bar', meta: {bar: 456}},
+            {url: 'http://example.com/bar', meta: {bar: 456}}
           ]
         }, function (result) {
           mock.done();
@@ -596,9 +591,6 @@ describe('Parselovin', function () {
           done();
         });
       });
-
     });
-
   });
-
 });

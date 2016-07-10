@@ -1,6 +1,3 @@
-/* jshint node: true */
-/* global -Promise */
-
 'use strict';
 
 var urlModule = require('url');
@@ -8,7 +5,6 @@ var urlModule = require('url');
 var cheerio = require('cheerio');
 var request = require('request');
 var extend = require('ampersand-class-extend');
-var Promise = require('promise');
 var pkg = require('./package.json');
 var defaultUserAgent = pkg.name + '/' + pkg.version + (pkg.homepage ? ' (' + pkg.homepage + ')' : '');
 var AWS, sqs;
@@ -16,7 +12,7 @@ var AWS, sqs;
 request = request.defaults({
   pool: {maxSockets: Infinity},
   timeout: 8000,
-  followRedirect: false,
+  followRedirect: false
 });
 
 var ogTypes = [
@@ -24,7 +20,7 @@ var ogTypes = [
   'music',
   'article',
   'book',
-  'profile',
+  'profile'
 ];
 
 var sendAWSResponse = function (aws, result, callback) {
@@ -36,7 +32,7 @@ var sendAWSResponse = function (aws, result, callback) {
 
   var params = {
     MessageBody: JSON.stringify(result),
-    QueueUrl: aws,
+    QueueUrl: aws
   };
 
   sqs.sendMessage(params, function (err, data) {
@@ -51,8 +47,8 @@ var sendAWSResponse = function (aws, result, callback) {
 
 var createRequestHeaders = function (options) {
   return {
-    'User-Agent' : ((options.userAgent || '') + ' ' + defaultUserAgent).trim(),
-    'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'User-Agent': ((options.userAgent || '') + ' ' + defaultUserAgent).trim(),
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
   };
 };
 
@@ -199,7 +195,6 @@ MetaDataParser.prototype.extractOg = function ($, data) {
     return localData;
   };
 
-
   data.og = $('meta[property^="og:"]').get().reduce(extractOG, {});
   data.og = normalizeOGData(data.og);
 
@@ -238,7 +233,7 @@ MetaDataParser.prototype.extractMetaProperties = function ($, data) {
 };
 
 MetaDataParser.prototype.extractLinks = function ($, data) {
-  //TODO: Extract from context.res headers as well
+  // TODO: Extract from context.res headers as well
 
   data.links = {};
 
@@ -271,7 +266,7 @@ MetaDataParser.prototype.extractLinks = function ($, data) {
         return;
       }
 
-      data.links[relation] = data.links[relation]  || [];
+      data.links[relation] = data.links[relation] || [];
       data.links[relation].push(value);
     });
   });
@@ -299,7 +294,7 @@ MetaDataParser.prototype.extract = function (url, html, res, options) {
   var baseUrl;
   var context = {
     url: url,
-    res: res,
+    res: res
   };
   var dataChain;
   var extractorSubset;
@@ -346,13 +341,13 @@ MetaDataParser.prototype.fetch = function (url, meta, options, callback) {
 
   request({
     url: url,
-    headers: createRequestHeaders(options),
+    headers: createRequestHeaders(options)
   }, function (err, res, body) {
     var result = {
       url: url,
-      meta: meta,
-    },
-    promisedResult;
+      meta: meta
+    };
+    var promisedResult;
 
     if (err) {
       promisedResult = Promise.reject(err);
@@ -387,8 +382,8 @@ MetaDataParser.prototype.fetch = function (url, meta, options, callback) {
 };
 
 MetaDataParser.prototype.fetchBatch = function (request, callback) {
-  var self = this,
-    aws;
+  var self = this;
+  var aws;
 
   if (callback.done) {
     aws = request.aws;
@@ -419,7 +414,7 @@ MetaDataParser.prototype.fetchBatch = function (request, callback) {
 
     result = {
       err: err,
-      result: result,
+      result: result
     };
 
     if (aws) {
