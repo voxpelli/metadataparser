@@ -6,7 +6,7 @@ var cheerio = require('cheerio');
 var request = require('request');
 var extend = require('ampersand-class-extend');
 var pkg = require('./package.json');
-var defaultUserAgent = pkg.name + '/' + pkg.version + (pkg.homepage ? ' (' + pkg.homepage + ')' : '');
+var defaultUserAgent = pkg.name.replace(/^@[^/]*\//, '') + '/' + pkg.version + (pkg.homepage ? ' (' + pkg.homepage + ')' : '');
 var AWS, sqs;
 
 request = request.defaults({

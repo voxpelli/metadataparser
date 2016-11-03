@@ -1,14 +1,14 @@
 {
-  "name": "metadataparser",
+  "name": "@voxpelli/metadataparser",
   "version": "1.1.0",
   "description": "Parses the metadata of a web page. Useful for eg. link previews / embeds",
   "private": true,
-  "author": "Pelle Wessman <pelle@bloglovin.com>",
-  "homepage": "https://github.com/bloglovin/metadataparser",
+  "author": "Pelle Wessman <pelle@kodfabrik.se>",
+  "homepage": "https://github.com/voxpelli/metadataparser",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/bloglovin/metadataparser.git"
+    "url": "git://github.com/voxpelli/metadataparser.git"
   },
   "engines": {
     "node": ">=4.0.0"
