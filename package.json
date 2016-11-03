@@ -16,7 +16,7 @@
   "dependencies": {
     "ampersand-class-extend": "^1.0.2",
     "aws-sdk": "^2.1.8",
-    "cheerio": "^0.19.0",
+    "cheerio": "^0.22.0",
     "promise": "^7.0.4",
     "request": "^2.51.0"
   },
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "chai": "^3.2.0",
-    "chai-as-promised": "^5.1.0",
+    "chai-as-promised": "^6.0.0",
     "coveralls": "^2.11.2",
     "dependency-check": "^2.5.2",
     "escape-string-regexp": "^1.0.3",
@@ -40,7 +40,7 @@
     "husky": "~0.11.4",
     "istanbul": "^0.4.5",
     "mocha": "^3.1.2",
-    "nock": "^2.10.0",
+    "nock": "^9.0.2",
     "sinon": "^1.12.1"
   }
 }
