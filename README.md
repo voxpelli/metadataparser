@@ -1,5 +1,10 @@
 # Metadataparser
 
+[![Build Status](https://travis-ci.org/voxpelli/metadataparser.svg?branch=master)](https://travis-ci.org/voxpelli/metadataparser)
+[![Coverage Status](https://coveralls.io/repos/github/voxpelli/metadataparser/badge.svg?branch=master)](https://coveralls.io/github/voxpelli/metadataparser?branch=master)
+[![Dependency Status](https://gemnasium.com/voxpelli/metadataparser.svg)](https://gemnasium.com/voxpelli/metadataparser)
+[![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat)](https://github.com/Flet/semistandard)
+
 ### The flow to update the Lambda method
 
 1. Do a `yarn install` using [Yarn](https://yarnpkg.com/) or a `npm install`
