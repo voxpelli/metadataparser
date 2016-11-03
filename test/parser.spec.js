@@ -4,7 +4,6 @@ var chai = require('chai');
 var nock = require('nock');
 var sinon = require('sinon');
 var chaiAsPromised = require('chai-as-promised');
-var Promise = require('promise');
 
 chai.use(chaiAsPromised);
 var should = chai.should();

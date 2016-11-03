@@ -16,7 +16,6 @@
     "ampersand-class-extend": "^1.0.2",
     "aws-sdk": "^2.1.8",
     "cheerio": "^0.22.0",
-    "promise": "^7.0.4",
     "request": "^2.51.0"
   },
   "scripts": {
