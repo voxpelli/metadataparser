@@ -1,3 +1,7 @@
+## 2.0.1 (2016-11-03)
+
+* **Minor:** Remove Promise polyfill
+
 ## 2.0.0 (2016-11-03)
 
 * **Breaking:** Now requires at least Node 4.x
