@@ -2,7 +2,6 @@
   "name": "@voxpelli/metadataparser",
   "version": "1.1.0",
   "description": "Parses the metadata of a web page. Useful for eg. link previews / embeds",
-  "private": true,
   "author": "Pelle Wessman <pelle@kodfabrik.se>",
   "homepage": "https://github.com/voxpelli/metadataparser",
   "license": "MIT",
