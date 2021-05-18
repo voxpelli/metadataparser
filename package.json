@@ -25,7 +25,7 @@
     "prepush": "npm test"
   },
   "devDependencies": {
-    "chai": "^3.2.0",
+    "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "coveralls": "^2.11.2",
     "dependency-check": "^2.5.2",
