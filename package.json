@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "ampersand-class-extend": "^1.0.2",
-    "aws-sdk": "^2.1.8",
+    "aws-sdk": "^2.929.0",
     "cheerio": "^0.22.0",
     "request": "^2.51.0"
   },
